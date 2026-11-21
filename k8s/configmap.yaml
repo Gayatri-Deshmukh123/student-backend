@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: student-backend-config
+data:
+  PORT: "3000"
+  DATA_FILE: "/app/data/students.json"

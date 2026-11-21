@@ -1,0 +1,14 @@
+{
+  "name": "student-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "REST API for student management",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

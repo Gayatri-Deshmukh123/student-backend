@@ -3,6 +3,10 @@ const { URL } = require("node:url");
 const { StudentStore } = require("./store");
 
 function sendJson(response, status, body) {
+  if (status === 204) {
+    response.writeHead(status);
+    return response.end();
+  }
   response.writeHead(status, {
     "Content-Type": "application/json",
     "Cache-Control": "no-store"
@@ -53,15 +57,21 @@ function createApp(options = {}) {
         return sendJson(response, 200, { status: "ready" });
       }
 
-      if (parts[0] !== "api" || parts[1] !== "students") {
+      if (!(
+        (parts[0] === "api" && parts[1] === "students") ||
+        parts[0] === "students"
+      )) {
         return sendJson(response, 404, { error: "Not found" });
       }
 
-      if (request.method === "GET" && parts.length === 2) {
+      const collectionLength = parts[0] === "api" ? 2 : 1;
+      const itemLength = collectionLength + 1;
+
+      if (request.method === "GET" && parts.length === collectionLength) {
         return sendJson(response, 200, await store.list());
       }
 
-      if (request.method === "POST" && parts.length === 2) {
+      if (request.method === "POST" && parts.length === collectionLength) {
         const input = await readJson(request);
         const validationError = validateStudent(input);
         if (validationError) return sendJson(response, 400, { error: validationError });
@@ -77,8 +87,8 @@ function createApp(options = {}) {
         return sendJson(response, 201, student);
       }
 
-      if (parts.length === 3) {
-        const id = decodeURIComponent(parts[2]);
+      if (parts.length === itemLength) {
+        const id = decodeURIComponent(parts[collectionLength]);
         if (request.method === "GET") {
           const student = await store.get(id);
           return student
